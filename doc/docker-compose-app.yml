@@ -4,7 +4,7 @@ version: '3.8'
 # 你需要修改system为你自身系统的仓库名
 services:
   s-pay-mall:
-    image: smll_pay1/test1:1.0
+    image: test1/test1:1.0
     container_name: test1
     restart: on-failure
     ports:
