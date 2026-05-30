@@ -1,21 +1,40 @@
-# /usr/local/bin/docker-compose -f /docs/dev-ops/environment/environment-docker-compose-2.4.yml up -d
+# ===============================
+# 镜像运行说明书 (docker-compose)
+# 用法: docker compose -f docker-compose-app.yml up -d
+# ===============================
+# Dockerfile 负责"造镜像"，这个文件负责"跑镜像"
+# 构建阶段完成后，在服务器上用这个文件拉取 ACR 镜像并运行
 version: '3.8'
-# docker-compose -f docker-compose-app.yml up -d
-# 你需要修改system为你自身系统的仓库名
+
 services:
   s-pay-mall:
-    image: test1/test1:1.0
+    # --- 镜像来源：ACR 阿里云容器镜像服务地址 ---
+    image: crpi-p7nxtgeamae37zf1.cn-heyuan.personal.cr.aliyuncs.com/smll_pay/smll_pay1:1.0
+
+    # --- 服务器上的容器名字（docker ps 能看到） ---
     container_name: test1
+
+    # --- 容器挂了自动重启 ---
     restart: on-failure
+
+    # --- 端口映射：宿主机端口 : 容器内部端口 ---
+    # 浏览器访问 8091 → 转发到容器内的 8091
     ports:
       - "8091:8091"
+
+    # --- 环境变量 ---
     environment:
-      - TZ=PRC
-      - SERVER_PORT=8091
+      - TZ=PRC              # 时区：中国
+      - SERVER_PORT=8091    # Spring Boot 监听 8091 端口
+
+    # --- 挂载：把容器内日志目录映射到宿主机 ./log ---
+    # 容器删了日志还在，不怕丢
     volumes:
       - ./log:/data/log
+
+    # --- 日志策略 ---
     logging:
       driver: "json-file"
       options:
-        max-size: "10m"
-        max-file: "3"
+        max-size: "10m"     # 单文件最大 10MB
+        max-file: "3"       # 最多保留 3 个文件，自动滚动
